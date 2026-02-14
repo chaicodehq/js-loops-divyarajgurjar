@@ -35,5 +35,40 @@
  *   // => { attempts: 5, success: false, totalWaitTime: 15 }
  */
 export function upiRetry(outcomes) {
-  // Your code here
+  // Validation
+  if (!Array.isArray(outcomes) || outcomes.length === 0) {
+    return { attempts: 0, success: false, totalWaitTime: 0 };
+  }
+
+  let attempts = 0;
+  let success = false;
+  let totalWaitTime = 0;
+  let waitTime = 1; // starts at 1s
+  let index = 0;
+
+  do {
+    attempts++;
+
+    const result = outcomes[index];
+
+    if (result === "success") {
+      success = true;
+      break;
+    }
+
+    // If fail and we can retry
+    if (
+      result === "fail" &&
+      attempts < 5 &&
+      index < outcomes.length - 1
+    ) {
+      totalWaitTime += waitTime;
+      waitTime *= 2; // exponential backoff
+    }
+
+    index++;
+
+  } while (attempts < 5 && index < outcomes.length);
+
+  return { attempts, success, totalWaitTime };
 }
