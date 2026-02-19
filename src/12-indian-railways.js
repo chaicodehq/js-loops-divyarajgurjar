@@ -45,73 +45,43 @@
  *   // => [{ name: "Rahul", trainNumber: "12345", class: "sleeper", status: "confirmed" }]
  */
 export function railwayReservation(passengers, trains) {
-  // Validation
-  if (
-    !Array.isArray(passengers) || passengers.length === 0 ||
-    !Array.isArray(trains) || trains.length === 0
-  ) {
-    return [];
-  }
-
-  const results = [];
-
-  for (let i = 0; i < passengers.length; i++) {
-    const passenger = passengers[i];
-    const { name, trainNumber, preferred, fallback } = passenger;
-
-    let trainFound = null;
-
-    // Find matching train (nested loop)
-    for (let j = 0; j < trains.length; j++) {
-      if (trains[j].trainNumber === trainNumber) {
-        trainFound = trains[j];
-        break;
-      }
+  if(!Array.isArray(passengers) || !Array.isArray(trains) || passengers.length ===0 || trains.length ===0) {return [ ]}
+  
+  let statusSeats = []
+  let seatClass = null
+  let seatStatus = 'train_not_found'
+  passengers.forEach((passenger) => {
+    let train = trains.find((train) => train.trainNumber === passenger.trainNumber)
+    if(train === undefined) {
+      return statusSeats.push({
+        name: passenger.name,
+        trainNumber: passenger.trainNumber,
+        class: seatClass,
+        status: seatStatus
+      })
     }
-
-    // Train not found
-    if (!trainFound) {
-      results.push({
-        name,
-        trainNumber,
-        class: null,
-        status: "train_not_found"
-      });
-      continue;
+    if(train.seats[passenger.preferred] > 0){
+      seatClass = passenger.preferred
+      seatStatus = 'confirmed'
+      //Decrementing the seats since it is confirmed
+      train.seats[passenger.preferred]-=1
+    } else if( train.seats[passenger.fallback] > 0){
+      seatClass = passenger.fallback
+      seatStatus = 'confirmed'
+      train.seats[passenger.fallback]-=1
+    } else {
+      seatClass = passenger.preferred
+      seatStatus = 'waitlisted'
     }
-
-    const seats = trainFound.seats;
-
-    // Try preferred class
-    if (seats[preferred] > 0) {
-      seats[preferred]--;
-      results.push({
-        name,
-        trainNumber,
-        class: preferred,
-        status: "confirmed"
-      });
-    }
-    // Try fallback class
-    else if (seats[fallback] > 0) {
-      seats[fallback]--;
-      results.push({
-        name,
-        trainNumber,
-        class: fallback,
-        status: "confirmed"
-      });
-    }
-    // Waitlist
-    else {
-      results.push({
-        name,
-        trainNumber,
-        class: preferred,
-        status: "waitlisted"
-      });
-    }
-  }
-
-  return results;
+   
+    statusSeats.push({
+        name: passenger.name,
+        trainNumber: passenger.trainNumber,
+        class: seatClass,
+        status: seatStatus
+      })
+    
+  })
+  
+  return statusSeats
 }

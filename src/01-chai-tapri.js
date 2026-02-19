@@ -29,23 +29,20 @@
 
 export function chaiTapriRevenue(customers) {
   // Validation check
-  if (
-    typeof customers !== "number" ||
-    !Number.isInteger(customers) ||
-    customers <= 0
-  ) {
-    return { totalChai: 0, totalRevenue: 0 };
-  }
-
-  const adrakCount = Math.floor(customers / 3);
-  const cuttingCount = customers - adrakCount;
-
-  const totalRevenue = (adrakCount * 15) + (cuttingCount * 10);
-
-  return {
-    totalChai: customers,
-    totalRevenue: totalRevenue
-  };
+//Daily Revenue chaiye
+//validate karo customers ko
+if(typeof customers !== 'number'  ) return {totalChai: 0, totalRevenue: 0}
+if(customers <= 0 || !Number.isInteger(customers)) return {totalChai: 0, totalRevenue: 0}
+//divide karo customer number
+// quotient lo
+const quotient = customers/3
+const totalRevenue = 15*Math.floor(quotient) + 10*(customers - Math.floor(quotient))
+const endResult = {
+  totalChai: customers,
+  totalRevenue: totalRevenue
+}
+// totalrevenue = 15*quotient + 10(number-quotient + remainder)
+return endResult
 }
 
 
